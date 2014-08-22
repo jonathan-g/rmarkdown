@@ -7,8 +7,11 @@
 #' @inheritParams html_document
 #'
 #' @param center \code{TRUE} to vertically center content on slides
+#' @param height Design height (in pixels) of slides
+#' @param width Design width (in pixels) of slides
 #' @param theme Visual theme ("default", "simple", sky", "beige", "serif", or
-#'   "solarized").
+#'   "solarized", "local").
+#' @param localtheme Name of a local theme file
 #' @param transition Slide transition ("default", "cube", "page", "concave",
 #'   "zoom", "linear", "fade", or "none")
 #' @param template Pandoc template to use for rendering. Pass "default"
@@ -70,6 +73,8 @@
 #' @export
 revealjs_presentation <- function(incremental = FALSE,
                                   center = FALSE,
+                                  width = NULL,
+                                  height = NULL,
                                   fig_width = 8,
                                   fig_height = 6,
                                   fig_retina = if (!fig_caption) 2,
@@ -77,8 +82,10 @@ revealjs_presentation <- function(incremental = FALSE,
                                   smart = TRUE,
                                   self_contained = TRUE,
                                   theme = "default",
+                                  localtheme = NULL,
                                   transition = "default",
                                   highlight = "default",
+                                  localhighlight = NULL,
                                   mathjax = "default",
                                   template = "default",
                                   includes = NULL,
@@ -106,6 +113,14 @@ revealjs_presentation <- function(incremental = FALSE,
   if (center)
     args <- c(args, "--variable", "center")
 
+  # width
+  if (! is.null(width) && identical(width,'default'))
+    args <- c(args, "--variable", "width")
+
+  # height
+  if (! is.null(height) && identical(width,'default'))
+    args <- c(args, "--variable", "height")
+
   # theme
   theme <- match.arg(theme, revealjs_themes())
   if (identical(theme, "default"))
@@ -114,9 +129,12 @@ revealjs_presentation <- function(incremental = FALSE,
     theme <- "default"
   if (theme %in% c("default", "blood", "moon", "night"))
     args <- c(args, "--variable", "theme-dark")
+    
   args <- c(args, "--variable", paste("theme=", theme, sep=""))
 
-
+  if (identical(theme, "local") && ! is.null(localtheme))
+    args <- c(args, "--variable", paste("localtheme=",localtheme,sep=""))
+    
   # transition
   transition <- match.arg(transition, revealjs_transitions())
   args <- c(args, "--variable", paste("transition=", transition, sep=""))
@@ -142,7 +160,7 @@ revealjs_presentation <- function(incremental = FALSE,
       revealjs_path <- relative_to(
         output_dir, render_supporting_files(revealjs_path, lib_dir))
     args <- c(args, "--variable", paste("revealjs-url=",
-                                        pandoc_path_arg(revealjs_path), sep=""))
+                                        URLencode(pandoc_path_arg(revealjs_path)), sep=""))
 
     # highlight
     args <- c(args, pandoc_highlight_args(highlight, default = "pygments"))
@@ -176,7 +194,8 @@ revealjs_themes <- function() {
     "dark",
     "blood",
     "moon",
-    "night")
+    "night",
+    "local")
 }
 
 
