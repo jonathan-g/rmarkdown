@@ -160,7 +160,7 @@ revealjs_presentation <- function(incremental = FALSE,
       revealjs_path <- relative_to(
         output_dir, render_supporting_files(revealjs_path, lib_dir))
     args <- c(args, "--variable", paste("revealjs-url=",
-                                        gsub('\\','/',pandoc_path_arg(revealjs_path),fixed=TRUE), sep=""))
+                                        pandoc_path_arg(revealjs_path), sep=""))
 
     # highlight
     args <- c(args, pandoc_highlight_args(highlight, default = "pygments"))
