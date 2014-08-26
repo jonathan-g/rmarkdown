@@ -257,7 +257,7 @@ pandoc_path_arg <- function(path) {
     i <- grep(' ', path)
     if (length(i))
       path[i] <- utils::shortPathName(path[i])
-    path <- gsub('/', '\\\\', path)
+    path <- gsub('\\\\', '/', path)
   }
 
   path
