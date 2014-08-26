@@ -3,21 +3,20 @@
 \alias{revealjs_presentation}
 \title{Convert to a reveal.js presentation}
 \usage{
-revealjs_presentation(incremental = FALSE, center = FALSE,
-  height = "default", width = "default", fig_width = 8, fig_height = 6,
-  fig_retina = if (!fig_caption) 2, fig_caption = FALSE, smart = TRUE,
-  self_contained = TRUE, vertical = FALSE, theme = "default",
+revealjs_presentation(incremental = FALSE, center = FALSE, fig_width = 8,
+  fig_height = 6, fig_retina = if (!fig_caption) 2, fig_caption = FALSE,
+  smart = TRUE, self_contained = TRUE, theme = "default",
   transition = "default", highlight = "default", mathjax = "default",
-  template = "default", local_theme = NULL, local_highlight = NULL,
-  reveal_version = "default", reveal_source = "default", includes = NULL,
-  keep_md = FALSE, lib_dir = NULL, plugin_dir = NULL,
-  pandoc_args = NULL, ...)
+  template = "default", vertical = FALSE, height = NULL, width = NULL,
+  local_theme = NULL, local_highlight = NULL, reveal_version = "default",
+  reveal_source = "default", includes = NULL, keep_md = FALSE,
+  lib_dir = NULL, plugin_dir = NULL, pandoc_args = NULL, ...)
 }
 \arguments{
 \item{center}{\code{TRUE} to vertically center content on slides}
 
 \item{height}{the default height (in pixels) of the presentation slides.
-\code{'default'} uses the reveal.js default of 700.}
+"default" uses the reveal.js default of 700.}
 
 \item{width}{the default width (in pixels) of the presentation slides.
 "default" uses the reveal.js default of 960.}

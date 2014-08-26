@@ -15,7 +15,8 @@ Imports:
     knitr (>= 1.6),
     yaml (>= 2.1.5),
     htmltools (>= 0.2.4),
-    caTools
+    caTools,
+    RJSONIO
 Suggests:
     shiny (>= 0.9.1.9009),
     testthat,

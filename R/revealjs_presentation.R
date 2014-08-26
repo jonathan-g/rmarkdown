@@ -199,9 +199,8 @@ revealjs_presentation <- function(incremental = FALSE,
       revealjs_path <- relative_to(
         output_dir, render_supporting_files(revealjs_path, lib_dir))
     args <- c(args, "--variable", 
-              paste("revealjs-url=",URLencode(paste('file://',
-                                          pandoc_path_arg(revealjs_path), 
-                                          sep="")))
+              paste("revealjs-url=",gsub('/','\\\\',
+                                         pandoc_path_arg(revealjs_path)),sep=""))
     if (is.null(plugin_dir))
       plugin_dir <- file.path(pandoc_path_arg(revealjs_path), "plugin")
     message(paste('plugin_dir = "', plugin_dir, '"', sep=""))
@@ -237,7 +236,7 @@ revealjs_presentation <- function(incremental = FALSE,
 
 
 get_reveal_version <- function(package.json) {
-  package <- fromJSON(package.json)
+  package <- RJSONIO::fromJSON(package.json)
   if (identical(package$name, "reveal.js"))
     return(package$version)
   else
