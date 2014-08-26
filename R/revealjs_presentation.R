@@ -123,10 +123,11 @@ revealjs_presentation <- function(incremental = FALSE,
     reveal_json_package <- file.path(reveal_source, 'package.json')
     if (file.exists(reveal_json_package)) {
       test_reveal_version <- get_reveal_version(reveal_json_package)
-      if reveal_versions_match(reveal_version, test_reveal_version) {
+      if (reveal_versions_match(reveal_version, test_reveal_version)) {
         reveal_version <- test_reveal_version
       } else {
-        error(paste("Could not find reveal.js version ", reveal_version, " at ", reveal_source, ".", sep=''))
+        error(paste("Could not find reveal.js version ", reveal_version, 
+                    " at ", reveal_source, ".", sep=''))
       }
     }
   }
@@ -242,6 +243,22 @@ revealjs_presentation <- function(incremental = FALSE,
                                      pandoc_args = pandoc_args, ...))
 }
 
+get_reveal_version <- function(package.json) {
+  package <- fromJSON(package.json)
+  if (identical(package$name, "reveal.js"))
+    return(package$version)
+  else
+    return(NULL)
+}
+
+reveal_versions_match <- function(target, ondisk){
+  if (is.null(ondisk))
+    return(FALSE)
+  if (identical(target,"any"))
+    return(TRUE)
+  return(identical(target,ondisk))
+}
+
 revealjs_themes <- function() {
   c("default",
     "simple",
@@ -268,5 +285,4 @@ revealjs_transitions <- function() {
     "local",
     "none")
 }
-
 
