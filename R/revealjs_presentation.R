@@ -8,7 +8,7 @@
 #'
 #' @param center \code{TRUE} to vertically center content on slides
 #' @param height the default height (in pixels) of the presentation slides. 
-#'   \code{'default'} uses the reveal.js default of 700.
+#'   "default" uses the reveal.js default of 700.
 #' @param width the default width (in pixels) of the presentation slides. 
 #'   "default" uses the reveal.js default of 960.
 #' @param theme Visual theme ("default", "simple", sky", "beige", "serif", 
@@ -25,7 +25,7 @@
 #' @param reveal_version The version of reveal.js to use. Defaults to 2.6.1
 #' @param reveal_source A path to the source for reveal.js. Defaults to the 
 #'   source supplied with rmarkdown.
-#' @plugin_dir The directory for reveal.js to look for plugin javascript.
+#' @param plugin_dir The directory for reveal.js to look for plugin javascript.
 #'   Defaults to \code{reveal_source}/plugin or \code{lib_dir}/plugin if
 #'   \code{lib_dir} is specified.
 #'
@@ -81,20 +81,20 @@
 #' @export
 revealjs_presentation <- function(incremental = FALSE,
                                   center = FALSE,
-                                  height = "default",
-                                  width = "default",
                                   fig_width = 8,
                                   fig_height = 6,
                                   fig_retina = if (!fig_caption) 2,
                                   fig_caption = FALSE,
                                   smart = TRUE,
                                   self_contained = TRUE,
-                                  vertical = FALSE,
                                   theme = "default",
                                   transition = "default",
                                   highlight = "default",
                                   mathjax = "default",
                                   template = "default",
+                                  vertical = FALSE,
+                                  height = NULL,
+                                  width = NULL,
                                   local_theme = NULL,
                                   local_highlight = NULL,
                                   reveal_version = "default",
@@ -116,11 +116,11 @@ revealjs_presentation <- function(incremental = FALSE,
   if (identical(reveal_source,"default"))
     reveal_source <- rmarkdown_system_file("rmd/revealjs/")
 
-  test_path <- file.path(reveal_source, paste('reveal.js-',reveal_version,sep=''))
+  test_path <- file.path(reveal_source, paste("reveal.js-",reveal_version,sep=''))
   if (file.exists(test_path)) {
     reveal_source <- test_path
   } else {
-    reveal_json_package <- file.path(reveal_source, 'package.json')
+    reveal_json_package <- file.path(reveal_source, "package.json")
     if (file.exists(reveal_json_package)) {
       test_reveal_version <- get_reveal_version(reveal_json_package)
       if (reveal_versions_match(reveal_version, test_reveal_version)) {
@@ -149,11 +149,11 @@ revealjs_presentation <- function(incremental = FALSE,
     args <- c(args, "--variable", "center")
   
   # height
-  if (! is.null(height) && ! identical(height, 'default'))
+  if (! is.null(height) && ! identical(height, "default"))
     args <- c(args, "--variable", "height")
   
   # width
-  if (! is.null(width) && ! identical(width, 'default'))
+  if (! is.null(width) && ! identical(width, "default"))
     args <- c(args, "--variable", "width")
   
   # vertical
@@ -161,14 +161,6 @@ revealjs_presentation <- function(incremental = FALSE,
     args <- c(args,"--slide-level=2")
   }
   
-  # width
-  if (! is.null(width) && identical(width,'default'))
-    args <- c(args, "--variable", "width")
-
-  # height
-  if (! is.null(height) && identical(width,'default'))
-    args <- c(args, "--variable", "height")
-
   # theme
   theme <- match.arg(theme, revealjs_themes())
   if (identical(theme, "default"))
@@ -182,9 +174,6 @@ revealjs_presentation <- function(incremental = FALSE,
     
   args <- c(args, "--variable", paste("theme=", theme, sep=""))
 
-  if (identical(theme, "local") && ! is.null(localtheme))
-    args <- c(args, "--variable", paste("localtheme=",localtheme,sep=""))
-    
   # transition
   transition <- match.arg(transition, revealjs_transitions())
   args <- c(args, "--variable", paste("transition=", transition, sep=""))
@@ -212,8 +201,8 @@ revealjs_presentation <- function(incremental = FALSE,
     args <- c(args, "--variable", paste("revealjs-url=",
                                         pandoc_path_arg(revealjs_path), sep=""))
     if (is.null(plugin_dir))
-      plugin_dir <- file.path(pandoc_path_arg(revealjs_path), 'plugin')
-    message(paste('plugin_dir = "', plugin_dir, '"', sep=''))
+      plugin_dir <- file.path(pandoc_path_arg(revealjs_path), "plugin")
+    message(paste('plugin_dir = "', plugin_dir, '"', sep=""))
     args <- c(args, "--variable", 
               paste("plugin-url=", URLencode(plugin_dir), sep=""))
 
@@ -242,6 +231,8 @@ revealjs_presentation <- function(incremental = FALSE,
                                      mathjax = mathjax,
                                      pandoc_args = pandoc_args, ...))
 }
+
+
 
 get_reveal_version <- function(package.json) {
   package <- fromJSON(package.json)

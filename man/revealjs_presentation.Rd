@@ -3,28 +3,47 @@
 \alias{revealjs_presentation}
 \title{Convert to a reveal.js presentation}
 \usage{
-revealjs_presentation(incremental = FALSE, center = FALSE, fig_width = 8,
-  fig_height = 6, fig_retina = if (!fig_caption) 2, fig_caption = FALSE,
-  smart = TRUE, self_contained = TRUE, theme = "default",
+revealjs_presentation(incremental = FALSE, center = FALSE,
+  height = "default", width = "default", fig_width = 8, fig_height = 6,
+  fig_retina = if (!fig_caption) 2, fig_caption = FALSE, smart = TRUE,
+  self_contained = TRUE, vertical = FALSE, theme = "default",
   transition = "default", highlight = "default", mathjax = "default",
-  template = "default", includes = NULL, keep_md = FALSE,
-  lib_dir = NULL, pandoc_args = NULL, ...)
+  template = "default", local_theme = NULL, local_highlight = NULL,
+  reveal_version = "default", reveal_source = "default", includes = NULL,
+  keep_md = FALSE, lib_dir = NULL, plugin_dir = NULL,
+  pandoc_args = NULL, ...)
 }
 \arguments{
 \item{center}{\code{TRUE} to vertically center content on slides}
 
-\item{theme}{Visual theme ("default", "simple", sky", "beige", "serif", or
-"solarized").}
+\item{height}{the default height (in pixels) of the presentation slides.
+\code{'default'} uses the reveal.js default of 700.}
+
+\item{width}{the default width (in pixels) of the presentation slides.
+"default" uses the reveal.js default of 960.}
+
+\item{theme}{Visual theme ("default", "simple", sky", "beige", "serif",
+"solarized", or "local"). If choosing "local", you must supply a
+values for \code{local_theme}.}
 
 \item{transition}{Slide transition ("default", "cube", "page", "concave",
 "zoom", "linear", "fade", or "none")}
 
 \item{template}{Pandoc template to use for rendering. Pass "default"
-  to use the rmarkdown package default template; pass \code{NULL}
-  to use pandoc's built-in template; pass a path to use a custom template
-  that you've created. Note that if you don't use the "default" template
-  then some features of \code{revealjs_presentation} won't be available
-  (see the Templates section below for more details).}
+to use the rmarkdown package default template; pass \code{NULL}
+to use pandoc's built-in template; pass a path to use a custom template
+that you've created. Note that if you don't use the "default" template
+then some features of \code{revealjs_presentation} won't be available
+(see the Templates section below for more details).}
+
+\item{reveal_version}{The version of reveal.js to use. Defaults to 2.6.1}
+
+\item{reveal_source}{A path to the source for reveal.js. Defaults to the
+source supplied with rmarkdown.}
+
+\item{plugin_dir}{The directory for reveal.js to look for plugin javascript.
+  Defaults to \code{reveal_source}/plugin or \code{lib_dir}/plugin if
+  \code{lib_dir} is specified.}
 
 \item{incremental}{\code{TRUE} to render slide bullets incrementally. Note
 that if you want to reverse the default incremental behavior for an
