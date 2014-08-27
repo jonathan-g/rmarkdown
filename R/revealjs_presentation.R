@@ -116,19 +116,25 @@ revealjs_presentation <- function(incremental = FALSE,
   if (identical(reveal_source,"default"))
     reveal_source <- rmarkdown_system_file("rmd/revealjs/")
 
+  message(paste("reveal_source =", reveal_source))
   test_path <- file.path(reveal_source, paste("reveal.js-",reveal_version,sep=''))
   if (file.exists(test_path)) {
     reveal_source <- test_path
+    message(paste("Updating reveal_source <-", reveal_source))
   } else {
+    message(paste("Rejecting test path", test_path))
     reveal_json_package <- file.path(reveal_source, "package.json")
     if (file.exists(reveal_json_package)) {
       test_reveal_version <- get_reveal_version(reveal_json_package)
       if (reveal_versions_match(reveal_version, test_reveal_version)) {
         reveal_version <- test_reveal_version
+        message(paste("Updating reveal_version <-", reveal_version))
       } else {
-        error(paste("Could not find reveal.js version ", reveal_version, 
+        stop(paste("Could not find reveal.js version ", reveal_version, 
                     " at ", reveal_source, ".", sep=''))
       }
+    } else {
+      stop(paste("Could not find reveal.js directory at ", reveal_source))
     }
   }
 
@@ -150,11 +156,11 @@ revealjs_presentation <- function(incremental = FALSE,
   
   # height
   if (! is.null(height) && ! identical(height, "default"))
-    args <- c(args, "--variable", "height")
+    args <- c(args, "--variable", paste("height=",height,sep=''))
   
   # width
   if (! is.null(width) && ! identical(width, "default"))
-    args <- c(args, "--variable", "width")
+    args <- c(args, "--variable", paste("width=",width,sep=''))
   
   # vertical
   if (vertical) {
