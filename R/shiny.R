@@ -66,6 +66,15 @@
 run <- function(file = "index.Rmd", dir = dirname(file), default_file = NULL,
                 auto_reload = TRUE, shiny_args = NULL, render_args = NULL) {
 
+  # if the file argument is missing then substitute ui.Rmd if it exists
+  # (and index.Rmd does not exist)
+  if (missing(file) && missing(default_file)) {
+    if (!file.exists(file.path(dir, "index.Rmd")) &&
+        file.exists(file.path(dir, "ui.Rmd"))) {
+      file <- file.path(dir, "ui.Rmd")
+    }
+  }
+
   # select the document to serve at the root URL if not user-specified. We exclude
   # documents which start with a leading underscore (same pattern is used to
   # designate "sub-documents" in R Markdown websites and bookdown)
@@ -75,8 +84,8 @@ run <- function(file = "index.Rmd", dir = dirname(file), default_file = NULL,
       # just one R Markdown document
       default_file <- allRmds
     } else {
-      # more than one: look for an index
-      index <- which(tolower(allRmds) == "index.rmd")
+      # more than one: look for an index or ui
+      index <- which(tolower(allRmds) %in% c("index.rmd", "ui.rmd"))
       if (length(index) > 0) {
         default_file <- allRmds[index[1]]
       } else {
@@ -94,7 +103,7 @@ run <- function(file = "index.Rmd", dir = dirname(file), default_file = NULL,
 
   if (is.null(default_file)) {
     # no R Markdown default found; how about an HTML?
-    indexHtml <- list.files(dir, "index.html?", ignore.case = TRUE)
+    indexHtml <- list.files(dir, "(index|ui).html?", ignore.case = TRUE)
     if (length(indexHtml) > 0) default_file <- indexHtml[1]
   }
 
@@ -122,7 +131,20 @@ run <- function(file = "index.Rmd", dir = dirname(file), default_file = NULL,
 
   # determine the runtime of the target file
   target_file <- file %||% file.path(dir, default_file)
-  runtime <- if (length(target_file)) yaml_front_matter(target_file)$runtime
+  yaml_front <- if (length(target_file)) yaml_front_matter(target_file)
+  runtime <- yaml_front$runtime
+  theme <- render_args$output_options$theme
+  # Let shiny::getCurrentTheme() know about the yaml's theme, so
+  # things like `bslib::bs_themer()` can work with prerendered documents.
+  # Also note that we add the actual shiny::bootstrapLib() dependency
+  # inside the document's pre-processing hook so the 'last' version of
+  # the theme wins out
+  if (length(target_file)) {
+    format <- output_format_from_yaml_front_matter(read_utf8(target_file))
+    old_theme <- shiny::getCurrentTheme()
+    on.exit(set_current_theme(old_theme), add = TRUE)
+    set_current_theme(resolve_theme(format$options$theme))
+  }
 
   # run using the requested mode
   if (is_shiny_prerendered(runtime)) {
@@ -312,7 +334,7 @@ rmarkdown_shiny_ui <- function(dir, file) {
     }
 
     # request must be for an R Markdown or HTML document
-    ext <- tolower(tools::file_ext(req_path))
+    ext <- tolower(xfun::file_ext(req_path))
     if (!(ext %in% c("rmd", "htm", "html"))) return(NULL)
 
     # document must exist
@@ -378,7 +400,7 @@ rmd_cached_output <- function(input) {
   resource_folder <- ""
 
   # if the file is raw HTML, return it directly
-  if (tolower(tools::file_ext(input)) %in% c("htm", "html")) {
+  if (tolower(xfun::file_ext(input)) %in% c("htm", "html")) {
     return(list(
       cacheable = TRUE,
       cached = TRUE,
@@ -430,8 +452,10 @@ rmd_cached_output <- function(input) {
     }
   } else {
     # It's not cacheable, and should be rendered to a session-specific temporary
-    # file
-    output_dest <- tempfile(fileext = ".html")
+    # directory, but with a predictable file name.
+    tmp_dir <- tempfile()
+    output_dest_name <- xfun::with_ext(basename(input), ".html")
+    output_dest <- file.path(tmp_dir, output_dest_name)
   }
   list(
     cacheable = cacheable,
@@ -469,8 +493,10 @@ file.path.ci <- function(dir, name) {
 
   matches <- list.files(dir, name, ignore.case = TRUE, full.names = TRUE,
                         include.dirs = TRUE)
-  if (length(matches) == 0)
-    return(default)
+  # name is used as a pattern above and can match other files
+  # so we need to filter as if it was literal string
+  matches <- matches[tolower(name) == tolower(basename(matches))]
+  if (length(matches) == 0) return(default)
   return(matches[[1]])
 }
 
@@ -541,7 +567,7 @@ is_shiny_classic <- function(runtime) {
 }
 
 is_shiny_prerendered <- function(runtime) {
-  identical(runtime, "shiny_prerendered")
+  identical(runtime, "shinyrmd") || identical(runtime, "shiny_prerendered")
 }
 
 write_shiny_deps <- function(files_dir,
@@ -567,4 +593,11 @@ read_shiny_deps <- function(files_dir) {
   } else {
     list()
   }
+}
+
+
+# shiny:::setCurrentTheme() was added in 1.6 (we may export in next version)
+set_current_theme <- function(theme) {
+  set_theme <- asNamespace("shiny")$setCurrentTheme
+  if (is.function(set_theme)) set_theme(theme)
 }

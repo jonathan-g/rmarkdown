@@ -257,7 +257,7 @@ parse_html_notebook <- function(path) {
     if (!identical(c(matches), -1L)) {
       start <- c(attr(matches, "capture.start"))
       end   <- start + c(attr(matches, "capture.length")) - 1
-      decoded <- rawToChar(base64enc::base64decode(substring(line, start, end)))
+      decoded <- rawToChar(xfun::base64_decode(substring(line, start, end)))
       rmd_contents <- strsplit(decoded, "\\r?\\n", perl = TRUE)[[1]]
       next
     }
@@ -443,16 +443,13 @@ validate_output_source <- function(output_source) {
   error_msg <- sprintf("%s '%s'", prefix, required_signature)
 
   # ensure function
-  if (!is.function(output_source))
-    stop(error_msg, call. = FALSE)
+  if (!is.function(output_source)) stop2(error_msg)
 
   # check formals
   fmls <- names(formals(output_source))
-  if (length(fmls) < 3)
-    stop(error_msg, call. = FALSE)
+  if (length(fmls) < 3) stop2(error_msg)
 
-  if (!("..." %in% fmls))
-    stop(error_msg, call. = FALSE)
+  if (!("..." %in% fmls)) stop2(error_msg)
 
   TRUE
 }

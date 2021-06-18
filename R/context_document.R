@@ -1,7 +1,7 @@
 #' Convert to a ConTeXt document
 #'
 #' Format for converting from R Markdown to PDF using
-#' \href{https://wiki.contextgarden.net/}{ConTeXt}.
+#' \href{https://wiki.contextgarden.net/Main_Page}{ConTeXt}.
 #'
 #' ConTeXt needs to be installed. To install the most recent version, see
 #' \url{https://wiki.contextgarden.net/Installation}. A less recent version is
@@ -35,14 +35,14 @@ context_document <- function(toc = FALSE,
                              number_sections = FALSE,
                              fig_width = 6.5,
                              fig_height = 4.5,
-                             fig_crop = TRUE,
+                             fig_crop = 'auto',
                              fig_caption = TRUE,
                              dev = "pdf",
                              df_print = "default",
                              template = NULL,
                              keep_tex = FALSE,
                              keep_md = FALSE,
-                             citation_package = c("none", "natbib", "biblatex"),
+                             citation_package = c("default", "natbib", "biblatex"),
                              includes = NULL,
                              md_extensions = NULL,
                              output_extensions = NULL,
@@ -56,10 +56,10 @@ context_document <- function(toc = FALSE,
   sys_context <- if (is.null(context_path)) find_program("context") else context_path
   ext <- match.arg(ext)
   if (identical(ext, ".pdf") && !nzchar(sys_context))
-    stop("Cannot find ConTeXt.\n",
+    stop2("Cannot find ConTeXt.\n",
          "Please, check that ConTeXt is installed.\n",
-         "For more information, see the help page '?context_document'.",
-         call. = FALSE)
+         "For more information, see the help page '?context_document'."
+         )
 
   # base pandoc options for all ConTeXt output
   args <- c("--standalone")
@@ -89,9 +89,6 @@ context_document <- function(toc = FALSE,
 
   # content includes
   args <- c(args, includes_to_pandoc_args(includes))
-
-  # lua filters (added if pandoc > 2)
-  args <- c(args, pandoc_lua_filters("pagebreak.lua"))
 
   # args args
   args <- c(args, pandoc_args)
@@ -129,11 +126,14 @@ context_document <- function(toc = FALSE,
   # return format
   output_format(
     knitr = knitr_options_pdf(fig_width, fig_height, fig_crop, dev),
-    pandoc = pandoc_options(to = paste(c("context", output_extensions), collapse = ""),
-                            from = from_rmarkdown(fig_caption, md_extensions),
-                            args = args,
-                            keep_tex = FALSE,
-                            ext = ext),
+    pandoc = pandoc_options(
+      to = paste(c("context", output_extensions), collapse = ""),
+      from = from_rmarkdown(fig_caption, md_extensions),
+      args = args,
+      keep_tex = FALSE,
+      ext = ext,
+      lua_filters = pkg_file_lua("pagebreak.lua")
+    ),
     clean_supporting = !isTRUE(keep_tex),
     keep_md = keep_md,
     df_print = df_print,

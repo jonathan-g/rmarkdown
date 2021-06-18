@@ -2,7 +2,7 @@
 #'
 #' Format for converting from R Markdown to a Beamer presentation.
 #'
-#' See the \href{https://rmarkdown.rstudio.com/beamer_presentation_format.html}{online
+#' See the \href{https://bookdown.org/yihui/rmarkdown/beamer-presentation.html}{online
 #' documentation} for additional details on using the \code{beamer_presentation}
 #' format.
 #'
@@ -54,7 +54,7 @@ beamer_presentation <- function(toc = FALSE,
                                 incremental = FALSE,
                                 fig_width = 10,
                                 fig_height = 7,
-                                fig_crop = TRUE,
+                                fig_crop = 'auto',
                                 fig_caption = TRUE,
                                 dev = 'pdf',
                                 df_print = "default",
@@ -111,7 +111,7 @@ beamer_presentation <- function(toc = FALSE,
   args <- c(args, pandoc_highlight_args(highlight))
 
   # latex engine
-  latex_engine <- match.arg(latex_engine, c("pdflatex", "lualatex", "xelatex"))
+  latex_engine <- match.arg(latex_engine, c("pdflatex", "lualatex", "xelatex", "tectonic"))
   args <- c(args, pandoc_latex_engine_args(latex_engine))
 
   # citation package
@@ -125,8 +125,6 @@ beamer_presentation <- function(toc = FALSE,
 
   # make sure the graphics package is always loaded
   if (identical(template, "default")) args <- c(args, "--variable", "graphics=yes")
-
-  args <- c(args, pandoc_lua_filters(c("pagebreak.lua", "latex-div.lua")))
 
   # custom args
   args <- c(args, pandoc_args)
@@ -151,11 +149,14 @@ beamer_presentation <- function(toc = FALSE,
   # return format
   output_format(
     knitr = knitr_options_pdf(fig_width, fig_height, fig_crop, dev),
-    pandoc = pandoc_options(to = "beamer",
-                            from = from_rmarkdown(fig_caption, md_extensions),
-                            args = args,
-                            latex_engine = latex_engine,
-                            keep_tex = keep_tex),
+    pandoc = pandoc_options(
+      to = "beamer",
+      from = from_rmarkdown(fig_caption, md_extensions),
+      args = args,
+      latex_engine = latex_engine,
+      keep_tex = keep_tex,
+      lua_filters = pkg_file_lua(c("pagebreak.lua", "latex-div.lua"))
+    ),
     pre_processor = pre_processor,
     intermediates_generator = intermediates_generator,
     clean_supporting = !keep_tex,

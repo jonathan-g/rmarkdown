@@ -13,7 +13,7 @@ copy_html_resources <- function(html_str, lib_dir, output_dir) {
       # if the resource is a CSS file, perform a similar rewriting of its
       # content in the library directory
       res_path <- file.path(output_dir, res_src)
-      if (identical(tolower(tools::file_ext(res_path)), "css") &&
+      if (identical(tolower(xfun::file_ext(res_path)), "css") &&
           file.exists(res_path)) {
         css_content <- copy_resources(
           file_string(res_path), lib_dir, lib_dir, call_css_resource_attrs
@@ -102,10 +102,11 @@ copy_resources <- function(input_str, lib_dir, output_dir, resource_locator) {
 
       # the text from the current replacement to the end of the output,
       # if applicable
-      after <- if (res_rep == length(res_replacements))
-        substring(input_str, ch_pos)
-      else
+      after <- if (res_rep == length(res_replacements)) {
+        substring(input_str, ch_pos, last = nchar(input_str, type = "bytes"))
+      } else {
         ""
+      }
 
       # compose the next segment of the output from the text between
       # replacements and the current replacement text

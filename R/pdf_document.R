@@ -2,7 +2,7 @@
 #'
 #' Formats for converting from R Markdown to a PDF or LaTeX document.
 #'
-#' See the \href{https://rmarkdown.rstudio.com/pdf_document_format.html}{online
+#' See the \href{https://bookdown.org/yihui/rmarkdown/pdf-document.html}{online
 #' documentation} for additional details on using the \code{pdf_document}
 #' format.
 #'
@@ -41,15 +41,17 @@
 #'    \item{\code{linestretch}}{Options for line spacing (e.g. 1, 1.5, 3)}
 #' }
 #' @inheritParams html_document
-#' @param fig_crop \code{TRUE} to automatically apply the \code{pdfcrop} utility
-#'   (if available) to pdf figures
+#' @param fig_crop Whether to crop PDF figures with the command
+#'   \command{pdfcrop}. This requires the tools \command{pdfcrop} and
+#'   \command{ghostscript} to be installed. By default, \code{fig_crop = TRUE}
+#'   if these two tools are available.
 #' @param dev Graphics device to use for figure output (defaults to pdf)
 #' @param highlight Syntax highlighting style. Supported styles include
 #'   "default", "tango", "pygments", "kate", "monochrome", "espresso",
 #'   "zenburn", and "haddock". Pass \code{NULL} to prevent syntax highlighting.
 #' @param keep_tex Keep the intermediate tex file used in the conversion to PDF
 #' @param latex_engine LaTeX engine for producing PDF output. Options are
-#'   "pdflatex", "lualatex", and "xelatex".
+#'   "pdflatex", "lualatex", "xelatex" and "tectonic".
 #' @param citation_package The LaTeX package to process citations, \code{natbib}
 #'   or \code{biblatex}. Use \code{default} if neither package is to be used,
 #'   which means citations will be processed via the command
@@ -58,7 +60,7 @@
 #'   the rmarkdown package default template; pass \code{NULL} to use pandoc's
 #'   built-in template; pass a path to use a custom template that you've
 #'   created.  See the documentation on
-#'   \href{http://pandoc.org/README.html}{pandoc online documentation} for
+#'   \href{https://pandoc.org/MANUAL.html}{pandoc online documentation} for
 #'   details on creating custom templates.
 #' @param output_extensions Pandoc extensions to be added or removed from the
 #'   output format, e.g., \code{"-smart"} means the output format will be
@@ -89,7 +91,7 @@ pdf_document <- function(toc = FALSE,
                          number_sections = FALSE,
                          fig_width = 6.5,
                          fig_height = 4.5,
-                         fig_crop = TRUE,
+                         fig_crop = 'auto',
                          fig_caption = TRUE,
                          dev = 'pdf',
                          df_print = "default",
@@ -130,7 +132,7 @@ pdf_document <- function(toc = FALSE,
   args <- c(args, pandoc_highlight_args(highlight))
 
   # latex engine
-  latex_engine <- match.arg(latex_engine, c("pdflatex", "lualatex", "xelatex"))
+  latex_engine <- match.arg(latex_engine, c("pdflatex", "lualatex", "xelatex", "tectonic"))
   args <- c(args, pandoc_latex_engine_args(latex_engine))
 
   # citation package
@@ -141,9 +143,6 @@ pdf_document <- function(toc = FALSE,
 
   # make sure the graphics package is always loaded
   if (identical(template, "default")) args <- c(args, "--variable", "graphics")
-
-  # lua filters (added if pandoc > 2)
-  args <- c(args, pandoc_lua_filters(c("pagebreak.lua", "latex-div.lua")))
 
   # args args
   args <- c(args, pandoc_args)
@@ -196,11 +195,14 @@ pdf_document <- function(toc = FALSE,
   # return format
   output_format(
     knitr = knitr_options_pdf(fig_width, fig_height, fig_crop, dev),
-    pandoc = pandoc_options(to = paste(c("latex", output_extensions), collapse = ""),
-                            from = from_rmarkdown(fig_caption, md_extensions),
-                            args = args,
-                            latex_engine = latex_engine,
-                            keep_tex = keep_tex),
+    pandoc = pandoc_options(
+      to = paste(c("latex", output_extensions), collapse = ""),
+      from = from_rmarkdown(fig_caption, md_extensions),
+      args = args,
+      latex_engine = latex_engine,
+      keep_tex = keep_tex,
+      lua_filters = pkg_file_lua(c("pagebreak.lua", "latex-div.lua"))
+    ),
     clean_supporting = !keep_tex,
     keep_md = keep_md,
     df_print = df_print,
