@@ -26,6 +26,9 @@ $endif$
 $for(header-includes)$
 $header-includes$
 $endfor$
+$if(shiny-prerendered)$
+<!-- HEAD_CONTENT -->
+$endif$
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -178,6 +181,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+pre code {
+  padding: 0;
 }
 </style>
 
@@ -453,9 +459,9 @@ $endif$
 </div>
 
 $if(bs3)$
-<div class="toc-content col-sm-12 col-md-8 col-lg-9">
-$else$
 <div class="toc-content col-xs-12 col-sm-8 col-md-9">
+$else$
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
 $endif$
 
 $endif$
@@ -472,7 +478,7 @@ $if(theme)$
 $if(code_menu)$
 <div class="btn-group pull-right float-right">
 <button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
-<ul class="dropdown-menu" style="min-width: 50px;">
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
 $if(code_folding)$
 <li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
 <li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
@@ -609,6 +615,9 @@ $endif$
 $if(toc_float)$
 <script>
 $$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $$('.unlisted.unnumbered').addClass('toc-ignore')
 
     // move toc-ignore selectors from section div to header
     $$('div.section.toc-ignore')
