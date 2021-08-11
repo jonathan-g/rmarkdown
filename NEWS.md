@@ -8,6 +8,7 @@ rmarkdown 2.11
   where there is a shared master library with css, javascript, etc. and separate 
   child directories with RMarkdown files. #146 and #1859.
 
+
 rmarkdown 2.10
 ================================================================================
 
