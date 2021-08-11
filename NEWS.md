@@ -1,9 +1,27 @@
+rmarkdown 2.11
+================================================================================
+
+- `html_document` output allows `lib_dir` to point to a parent of the output 
+  directory if the `allow_uptree_lib_dir` parameter is set to `TRUE`. This used
+  to throw an error, "The path <file> does not appear to be a descendant of 
+  <dir>". This makes it possible to have a directory structure for HTML output
+  where there is a shared master library with css, javascript, etc. and separate 
+  child directories with RMarkdown files. #146 and #1859.
+
 rmarkdown 2.10
 ================================================================================
 
-- Enable rendering HTML output with a directory structure where there is a shared master library with css, javascript, etc. and separate child directories with RMarkdown files. #146
+- `md_document()` will now handle correctly `preserve_yaml` value for all variants and all pandoc versions (#2190). 
+  * with `preserve_yaml = TRUE`, markdown output will keep the YAML metadata block from the Rmd file.
+  * with `preserve_yaml = FALSE`, markdown output will have no YAML metadata block.
+  
+  This fixes a breaking change in Pandoc 2.13 regarding `gfm`, `commonmark` and `commonmark_x` which now supports `yaml_metadata_block` by default (#2118).  
 
+- New supported syntax for Shiny prerendered documents: you can now  use `server: shiny` or `server: type: shiny`.
 
+- Ability to inject additional functions into Shiny prerendered server scope using the "server-extras" context.
+
+- Fixed the syntax highlighting issue with R's pipe operator `|>` (thanks, @edzer, rstudio/bookdown#1157).
 
 rmarkdown 2.9
 ================================================================================

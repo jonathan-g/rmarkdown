@@ -16,12 +16,7 @@ NULL
 #' @rdname html-dependencies
 #' @export
 html_dependency_jquery <- function()  {
-
-  htmlDependency(
-    name = "jquery",
-    version = "1.11.3",
-    src = pkg_file("rmd/h/jquery"),
-    script = "jquery.min.js")
+  jquerylib::jquery_core()
 }
 
 # Create an HTML dependency for jQuery UI
@@ -41,6 +36,8 @@ html_dependency_jqueryui <- function() {
 #' @export
 html_dependency_bootstrap <- function(theme) {
   theme <- resolve_theme(theme)
+
+  # Bootstrap with bslib package
   if (is_bs_theme(theme)) {
     # TODO: would it make sense for these additional rules to come as a part of
     # bslib::bs_theme_dependencies() (for consistency sake)?
@@ -53,6 +50,8 @@ html_dependency_bootstrap <- function(theme) {
     )
     return(bslib::bs_theme_dependencies(theme))
   }
+
+  # Rmarkdown own BS3 dependency
   htmlDependency(
     name = "bootstrap",
     version = "3.3.5",
@@ -88,16 +87,35 @@ bootstrap_dependencies <- function(theme) {
 resolve_theme <- function(theme) {
   # theme = NULL means no Bootstrap
   if (is.null(theme)) return(theme)
+
   # Bootstrap/Bootswatch 3 names (backwards-compatibility)
   if (is.character(theme)) {
     if (length(theme) != 1) {
       stop2("`theme` must be character vector of length 1.")
     }
-    if (theme %in% c("bootstrap", "default")) {
-      return("bootstrap")
+    if (identical(theme, "default")) {
+      theme <- "bootstrap"
     }
+
+    # special handling triggered when bootstrap folder removed from installation folder
+    # In this case, bslib is used as default.
+    bslib_forced_mode <- getOption("rmarkdown.bslib_forced_mode", FALSE)
+    if (bslib_forced_mode || !dir.exists(pkg_file("rmd/h/bootstrap"))) {
+      # we are in special bslib default mode, theme is tweaked to be a list
+      if (!is_available("bslib")) {
+        stop2(
+          "bslib package is required and must be installed",
+          if (bslib_forced_mode) " when in special bslib forced mode",
+          "."
+        )
+      }
+      return(bslib::bs_theme(version = 3, bootswatch = theme))
+    }
+
     return(match.arg(theme, themes()))
   }
+
+  # Bootstrap theme handled by bslib package
   if (is.list(theme)) {
     if (!is_available("bslib")) {
       stop2("Providing a list to `theme` requires the bslib package.")
@@ -131,11 +149,8 @@ is_bs_theme <- function(theme) {
 }
 
 theme_version <- function(theme) {
-  if (is_bs_theme(theme)) {
-    bslib::theme_version(theme)
-  } else {
-    substr(html_dependency_bootstrap("default")$version, 1, 1)
-  }
+  if (is_bs_theme(theme)) return(bslib::theme_version(theme))
+  substr(html_dependency_bootstrap("default")$version, 1, 1)
 }
 
 
@@ -295,14 +310,98 @@ html_reference_path <- function(path, lib_dir, output_dir) {
     relative_to(output_dir, path)
 }
 
+copy_if_changed <- function(from, to, recursive = FALSE,
+                            overwrite = FALSE, copy.mode = FALSE) {
+  isdir = dir.exists(from)
+  if (isdir) {
+    if (! dir.exists(to)) {
+      dir.create(to, recursive = TRUE)
+    }
+    if (recursive) {
+      from2 = list.files(from, recursive = FALSE, include.dirs = TRUE,
+                        all.files = TRUE, no.. = TRUE)
+      mapply(copy_if_changed, from = file.path(from, from2),
+             to = file.path(to, from2),
+             MoreArgs = list(recursive = recursive, overwrite = overwrite,
+                             copy.mode = copy.mode))
+    }
+  } else {
+    digests <- tools::md5sum(c(from, to))
+    if (!isTRUE(digests[1] == digests[2])) {
+      file.copy(from, to, overwrite = TRUE, copy.mode = FALSE)
+    }
+  }
+}
+
+# This is an almost exact copy of htmltools::copyDependencyToDir, except that
+# it only copies files if necessary.
+#
+# Sometimes, a process (e.g., web server) will be accessing an HTML dependency
+# file when RMarkdown tries to overwrite it, and R throws an error reporting
+# insufficient privilege to delete or overwrite the file or directory.
+#
+# This function reduces that by only copying if the file has changed.
+#
+copy_html_dependency <- function(dependency, outputDir, mustWork = TRUE) {
+  dir <- dependency$src$file
+  if (is.null(dir)) {
+    if (mustWork) {
+      stop("Dependency ", dependency$name, " ",
+           dependency$version, " is not disk-based")
+    }
+    else {
+      return(dependency)
+    }
+  }
+  if (!is.null(dependency$package))
+    dir <- system.file(dir, package = dependency$package)
+  if (length(outputDir) != 1 || outputDir %in% c("",
+                                                 "/"))
+    stop("outputDir must be of length 1 and cannot be \"\" or \"/\"")
+  target_dir <- if (getOption("htmltools.dir.version",
+                              TRUE)) {
+    paste(dependency$name, dependency$version, sep = "-")
+  }
+  else dependency$name
+  target_dir <- file.path(outputDir, target_dir)
+  if (same_path(dir, target_dir))
+    return(dependency)
+  if (!dir_exists(outputDir))
+    dir.create(outputDir)
+
+  # Unlike htmltools::copyDependencyToDir(),
+  # we do not delete the target directory,  but we
+  # do create it if necessary.
+  if (! dir_exists(target_dir)) dir.create(target_dir)
+  files <- if (dependency$all_files)
+    list.files(dir)
+  else {
+    unlist(dependency[c("script", "stylesheet",
+                        "attachment")])
+  }
+  srcfiles <- file.path(dir, files)
+  if (any(!file.exists(srcfiles))) {
+    stop(sprintf("Can't copy dependency files that don't exist: '%s'",
+                 paste(srcfiles, collapse = "', '")))
+  }
+  destfiles <- file.path(target_dir, files)
+  isdir <- file.info(srcfiles)$isdir
+  destfiles <- ifelse(isdir, dirname(destfiles), destfiles)
+  mapply(copy_if_changed, from = srcfiles, to = destfiles,
+         recursive = isdir,
+         MoreArgs = list(overwrite = TRUE, copy.mode = FALSE))
+  dependency$src$file <- normalizePath(target_dir, "/", TRUE)
+  dependency
+}
+
 # return the html dependencies as an HTML string suitable for inclusion
 # in the head of a document
-html_dependencies_as_string <- function(dependencies, lib_dir, output_dir) {
+html_dependencies_as_string <- function(dependencies, lib_dir, output_dir,
+                                        allow_uptree_lib_dir = FALSE) {
   if (!is.null(lib_dir)) {
-    if (getOption("rmarkdown.uptree.dependencies", default=FALSE) &&
-        grepl("^\\.\\.", lib_dir)) {
+    if (allow_uptree_lib_dir && grepl("^\\.\\.", lib_dir)) {
       abs_lib_dir <- normalizePath(lib_dir, winslash = "/")
-      dependencies <- lapply(dependencies, copyDependencyToDir, abs_lib_dir,
+      dependencies <- lapply(dependencies, copy_html_dependency, abs_lib_dir,
                              mustWork = FALSE)
       dependencies <- lapply(dependencies, makeDependencyRelative, abs_lib_dir,
                              mustWork = FALSE)
@@ -318,6 +417,10 @@ html_dependencies_as_string <- function(dependencies, lib_dir, output_dir) {
       dependencies <- lapply(dependencies, makeDependencyRelative,
                              basepath = output_dir, mustWork = FALSE)
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> jg-tree-fix
   }
 
   # Dependencies are iterated on as file based dependencies needs to be
