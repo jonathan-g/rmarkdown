@@ -417,10 +417,6 @@ html_dependencies_as_string <- function(dependencies, lib_dir, output_dir,
       dependencies <- lapply(dependencies, makeDependencyRelative,
                              basepath = output_dir, mustWork = FALSE)
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> jg-tree-fix
   }
 
   # Dependencies are iterated on as file based dependencies needs to be
