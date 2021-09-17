@@ -168,7 +168,7 @@ see the documentation on R Markdown \link[=rmd_metadata]{metadata}.
 
 R Markdown documents also support citations. You can find more information on
 the markdown syntax for citations in the
-\href{https://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html}{Bibliographies
+\href{https://pandoc.org/MANUAL.html#citations}{Bibliographies
 and Citations} article in the online documentation.
 }
 \section{Anchor Sections Customization}{
@@ -296,23 +296,26 @@ parameter as an alternative to providing a fully custom template.
 \section{Directory structure}{
 
 
-By default \code{html_document} and related HTML document types put dependency
-files into the main output directory or a subdirectory specified by the
-\code{lib_dir} parameter:
-If \code{lib_dir} is not a direct descendant of the
-main output directory, \code{render()} will throw and error with the
-message "The path <file> does not appear to be a descendant of
-<dir>".
+By default \code{html_document} and related HTML document types put
+dependency files into the main output directory or a subdirectory specified
+by the \code{lib_dir} parameter:
+If \code{lib_dir} is not a direct descendant of the main output directory,
+\code{render()} will throw and error with the message
+"The path <file> does not appear to be a descendant of <dir>".
 
 Sometimes it is useful to have a directory tree where the different
-HTML documents are in their own subdirectories and the
-dependencies are in a common directory at the root of the site.
+HTML documents are in their own subdirectories and the dependencies are in
+a common directory at the root of the site.
 
 \itemize{
-\item{\code{main_dir}
+\item{
+\code{main_dir/}
 \itemize{
-\item{\code{lib/}
-\itemize{\item{dependencies go here}}
+\item{
+\code{lib/}
+\itemize{
+\item{dependencies go here}
+}
 }
 }
 \item{\code{index.Rmd}}
