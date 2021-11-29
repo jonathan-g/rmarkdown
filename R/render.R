@@ -375,12 +375,12 @@ render <- function(input,
     }
   }
 
-      # never use the original input directory as the intermediate directory,
-      # otherwise external resources discovered will be deleted as intermediate
-      # files later (because they are copied to the "intermediate" dir)
+  # never use the original input directory as the intermediate directory,
+  # otherwise external resources discovered will be deleted as intermediate
+  # files later (because they are copied to the "intermediate" dir)
   if (!is.null(intermediates_dir) &&
       same_path(intermediates_dir, dirname(original_input)))
-        intermediates_dir <- NULL
+    intermediates_dir <- NULL
 
   # force evaluation of knitr root dir before we change directory context
   force(knit_root_dir)

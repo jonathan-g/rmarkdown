@@ -1,6 +1,15 @@
 rmarkdown 2.12
 ================================================================================
 
+- `html_document` output allows `lib_dir` to point to a parent of the output 
+  directory if the `allow_uptree_lib_dir` parameter is set to `TRUE`. This used
+  to throw an error, "The path <file> does not appear to be a descendant of 
+  <dir>". This makes it possible to have a directory structure for HTML output
+  where there is a shared master library with css, javascript, etc. and separate 
+  child directories with RMarkdown files. #146 and #1859.
+
+- Added a global option `rmarkdown.html_dependency.header_attr` (`TRUE` by default). It can be set to `FALSE` to opt-out the HTML dependency `html_dependency_header_attrs()` in documents based on `html_document_base()` (thanks, @salim-b rstudio/bookdown#865, @maelle r-lib/downlit#1538).
+
 - `draft()` now works with `devtools::load_all()` and **testthat** when used in other packages. 
 
 rmarkdown 2.11
@@ -15,7 +24,6 @@ rmarkdown 2.11
 - Shiny prerendered documents are now pre-rendered in a child environment to avoid allowing the results of static code chunks to exist in the Shiny app environment (@gadenbuie, #2203).
 
 - The previously unexported function `convert_ipynb()` is exported now (thanks, @acircleda).
-
 
 rmarkdown 2.10
 ================================================================================
