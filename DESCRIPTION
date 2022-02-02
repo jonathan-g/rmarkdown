@@ -1,7 +1,7 @@
 Type: Package
 Package: rmarkdown
 Title: Dynamic Documents for R
-Version: 2.11.3.9000
+Version: 2.11.15.9000
 Authors@R: c(
     person("JJ", "Allaire", , "jj@rstudio.com", role = "aut"),
     person("Yihui", "Xie", , "xie@yihui.name", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0645-5666")),
@@ -21,6 +21,7 @@ Authors@R: c(
     person("Devon", "Ryan", , "dpryan79@gmail.com", role = "ctb", comment = c(ORCID = "0000-0002-8549-0971")),
     person("Frederik", "Aust", , "frederik.aust@uni-koeln.de", role = "ctb", comment = c(ORCID = "0000-0003-4900-788X")),
     person("Jeff", "Allen", , "jeff@rstudio.com", role = "ctb"), 
+    person("Jonathan", "Gilligan", role = "ctb", email = "jonathan.gilligan@gmail.com", comment = c(ORCID = "0000-0003-1375-6686")),
     person("JooYoung", "Seo", role = "ctb", comment = c(ORCID = "0000-0002-4064-6012")),
     person("Malcolm", "Barrett", role = "ctb"),
     person("Rob", "Hyndman", , "Rob.Hyndman@monash.edu", role = "ctb"),
@@ -48,7 +49,6 @@ Authors@R: c(
     person("Aidan", "Lister", role = c("ctb", "cph"), comment = "jQuery StickyTabs"),
     person("Benct Philip", "Jonsson", role = c("ctb", "cph"), comment = "pagebreak Lua filter"),
     person("Albert", "Krewinkel", role = c("ctb", "cph"), comment = "pagebreak Lua filter"),
-    person("Jonathan", "Gilligan", role = "ctb", email = "jonathan.gilligan@gmail.com", comment = c(ORCID = "0000-0003-1375-6686"))
   )
 Maintainer: Yihui Xie <xie@yihui.name>
 Description: Convert R Markdown documents into a variety of formats.
@@ -76,9 +76,10 @@ Suggests:
     dygraphs,
     fs,
     rsconnect,
+    downlit (>= 0.4.0),
     sass (>= 0.4.0),
     shiny (>= 1.6.0),
-    testthat (>= 3.0.0),
+    testthat (>= 3.0.3),
     tibble,
     tufte,
     vctrs,
