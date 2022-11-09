@@ -1,4 +1,4 @@
-rmarkdown 2.18
+rmarkdown 2.19
 ================================================================================
 
 - `html_document` output allows `lib_dir` to point to a parent of the output 
@@ -8,9 +8,13 @@ rmarkdown 2.18
   where there is a shared master library with css, javascript, etc. and separate 
   child directories with RMarkdown files. #146 and #1859.
 
+
+rmarkdown 2.18
+================================================================================
+
 - `rmarkdown::render()` argument `output_file` is now used for all output formats, if there is only one name for multiple output formats (thanks, @MaelAstruc, #2421).
 
-- Custom output formats can provide a custom function to convert Markdown input to the desired output format now. To do so, define the output format via `output_format(pandoc = pandoc_options(convert_fun = function(...) {}))`. The default converting function is `pandoc_convert()` in this package. See the help page `?pandoc_option` for more details.
+- Custom output formats can provide a custom function to convert Markdown input to the desired output format now. To do so, define the output format via `output_format(pandoc = pandoc_options(convert_fun = function(...) {}))`. The default converting function is `pandoc_convert()` in this package. See the help page `?pandoc_options` for more details.
 
 
 rmarkdown 2.17
