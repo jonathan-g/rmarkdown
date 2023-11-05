@@ -9,8 +9,6 @@
 #' @param site_name Name for the site (names must be unique within an account). Defaults
 #'   to the `name` provided by the site generator (or to the name of the site_dir if
 #'   there is no `name` specified).
-#' @param server Server name. Required only if you use the same account name on
-     multiple servers.
 #' @param account Account to deploy application to. This parameter is only required for
 #'   the initial deployment of an application when there are multiple accounts configured
 #'   on the system.
