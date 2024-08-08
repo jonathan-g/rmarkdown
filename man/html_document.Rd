@@ -480,28 +480,21 @@ HTML documents are in their own subdirectories and the dependencies are in
 a common directory at the root of the site.
 
 \itemize{
-\item{
+\item
 \code{main_dir/}
 \itemize{
-\item{
-\code{lib/}
+\item \code{lib/}
 \itemize{
-\item{dependencies go here}
+\item dependencies go here
 }
-}
-}
-\item{\code{index.Rmd}}
-\item{
-\code{node-01/}
+\item \code{index.Rmd}
+\item \code{node-01/}
 \itemize{
-\item{\code{index.Rmd}}
+\item \code{index.Rmd}
 }
-}
-\item{
-\code{node-02/}
+\item \code{node-02/}
 \itemize{
-\item{\code{index.Rmd}}
-}
+\item \code{index.Rmd}
 }
 }
 }
