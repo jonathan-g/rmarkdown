@@ -372,30 +372,23 @@
 #'  a common directory at the root of the site.
 #'
 #'  \itemize{
-#'  \item{
-#'  \code{main_dir/}
-#'  \itemize{
-#'  \item{
-#'  \code{lib/}
-#'  \itemize{
-#'  \item{dependencies go here}
-#'  }
-#'  }
-#'  }
-#'  \item{\code{index.Rmd}}
-#'  \item{
-#'  \code{node-01/}
-#'  \itemize{
-#'  \item{\code{index.Rmd}}
-#'  }
-#'  }
-#'  \item{
-#'  \code{node-02/}
-#'  \itemize{
-#'  \item{\code{index.Rmd}}
-#'  }
-#'  }
-#'  }
+#'    \item
+#'      \code{main_dir/}
+#'      \itemize{
+#'        \item \code{lib/}
+#'          \itemize{
+#'            \item dependencies go here
+#'          }
+#'      \item \code{index.Rmd}
+#'      \item \code{node-01/}
+#'        \itemize{
+#'          \item \code{index.Rmd}
+#'        }
+#'      \item \code{node-02/}
+#'        \itemize{
+#'          \item \code{index.Rmd}
+#'        }
+#'    }
 #'  }
 #'
 #'  One way to achieve this is with the `render_site` command, but knitting

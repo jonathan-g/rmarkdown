@@ -60,6 +60,7 @@ Other contributors:
   \item Devon Ryan \email{dpryan79@gmail.com} (\href{https://orcid.org/0000-0002-8549-0971}{ORCID}) [contributor]
   \item Frederik Aust \email{frederik.aust@uni-koeln.de} (\href{https://orcid.org/0000-0003-4900-788X}{ORCID}) [contributor]
   \item Jeff Allen \email{jeff@posit.co} [contributor]
+  \item Jonathan Gilligan \email{jonathan.gilligan@gmail.com} (\href{https://orcid.org/0000-0003-1375-6686}{ORCID}) [contributor]
   \item JooYoung Seo (\href{https://orcid.org/0000-0002-4064-6012}{ORCID}) [contributor]
   \item Malcolm Barrett [contributor]
   \item Rob Hyndman \email{Rob.Hyndman@monash.edu} [contributor]
