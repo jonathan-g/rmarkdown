@@ -9,6 +9,8 @@ rmarkdown 2.30
   child directories with RMarkdown files. #146 and #1859.
   (thanks, @jonathan-g, #2199)
 
+- `pandoc_convert()` will throw an error if Pandoc is not available (thanks, @brianperdomo, #2600).
+
 
 rmarkdown 2.29
 ================================================================================
