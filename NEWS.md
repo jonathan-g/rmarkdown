@@ -1,4 +1,4 @@
-rmarkdown 2.31
+rmarkdown 2.32
 ================================================================================
 
 - `html_document` output allows `lib_dir` to point to a parent of the output 
@@ -9,7 +9,15 @@ rmarkdown 2.31
   child directories with RMarkdown files. #146 and #1859.
   (thanks, @jonathan-g, #2199)
 
+
+rmarkdown 2.31
+================================================================================
+
+- Base64 encoded images work with non-HTML output formats now (thanks, @averissimo, #2604).
+
 - Use the argument `--syntax-highlighting` for Pandoc >= 3.8 since `--highlight-style` has been deprecated (thanks, @ywwry66, #2602).
+
+- `default_output_format()` will fall back to `html_document` if the output format in YAML cannot be recognized.
 
 
 rmarkdown 2.30
